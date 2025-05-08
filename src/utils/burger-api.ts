@@ -1,8 +1,10 @@
 import { setCookie, getCookie } from './cookie';
 import { TIngredient, TOrder, TOrdersData, TUser } from './types';
 
-const URL = process.env.BURGER_API_URL;
+const URL =
+  process.env.BURGER_API_URL || 'https://norma.nomoreparties.space/api';
 
+// проверка статуса запроса
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
 
@@ -15,6 +17,7 @@ type TRefreshResponse = TServerResponse<{
   accessToken: string;
 }>;
 
+// получение нового токена
 export const refreshToken = (): Promise<TRefreshResponse> =>
   fetch(`${URL}/auth/token`, {
     method: 'POST',
@@ -35,6 +38,7 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
       return refreshData;
     });
 
+// обновление токена, если он истек
 export const fetchWithRefresh = async <T>(
   url: RequestInfo,
   options: RequestInit
@@ -71,6 +75,7 @@ type TOrdersResponse = TServerResponse<{
   data: TOrder[];
 }>;
 
+// получение ингредиентов
 export const getIngredientsApi = () =>
   fetch(`${URL}/ingredients`)
     .then((res) => checkResponse<TIngredientsResponse>(res))
@@ -79,6 +84,7 @@ export const getIngredientsApi = () =>
       return Promise.reject(data);
     });
 
+// получение ленты заказов
 export const getFeedsApi = () =>
   fetch(`${URL}/orders/all`)
     .then((res) => checkResponse<TFeedsResponse>(res))
@@ -87,6 +93,7 @@ export const getFeedsApi = () =>
       return Promise.reject(data);
     });
 
+// получение списка заказов пользователя
 export const getOrdersApi = () =>
   fetchWithRefresh<TFeedsResponse>(`${URL}/orders`, {
     method: 'GET',
@@ -104,6 +111,7 @@ type TNewOrderResponse = TServerResponse<{
   name: string;
 }>;
 
+// отправка нового заказа
 export const orderBurgerApi = (data: string[]) =>
   fetchWithRefresh<TNewOrderResponse>(`${URL}/orders`, {
     method: 'POST',
@@ -119,10 +127,11 @@ export const orderBurgerApi = (data: string[]) =>
     return Promise.reject(data);
   });
 
-type TOrderResponse = TServerResponse<{
+export type TOrderResponse = TServerResponse<{
   orders: TOrder[];
 }>;
 
+// получение информации о конкретном заказе по номеру
 export const getOrderByNumberApi = (number: number) =>
   fetch(`${URL}/orders/${number}`, {
     method: 'GET',
@@ -137,12 +146,13 @@ export type TRegisterData = {
   password: string;
 };
 
-type TAuthResponse = TServerResponse<{
+export type TAuthResponse = TServerResponse<{
   refreshToken: string;
   accessToken: string;
   user: TUser;
 }>;
 
+// регистрация пользователя
 export const registerUserApi = (data: TRegisterData) =>
   fetch(`${URL}/auth/register`, {
     method: 'POST',
@@ -162,6 +172,7 @@ export type TLoginData = {
   password: string;
 };
 
+// вход пользователя
 export const loginUserApi = (data: TLoginData) =>
   fetch(`${URL}/auth/login`, {
     method: 'POST',
@@ -176,6 +187,7 @@ export const loginUserApi = (data: TLoginData) =>
       return Promise.reject(data);
     });
 
+// запрос на сброс пароля
 export const forgotPasswordApi = (data: { email: string }) =>
   fetch(`${URL}/password-reset`, {
     method: 'POST',
@@ -190,6 +202,7 @@ export const forgotPasswordApi = (data: { email: string }) =>
       return Promise.reject(data);
     });
 
+// установка нового пароля
 export const resetPasswordApi = (data: { password: string; token: string }) =>
   fetch(`${URL}/password-reset/reset`, {
     method: 'POST',
@@ -206,6 +219,7 @@ export const resetPasswordApi = (data: { password: string; token: string }) =>
 
 type TUserResponse = TServerResponse<{ user: TUser }>;
 
+// получение данных пользователя
 export const getUserApi = () =>
   fetchWithRefresh<TUserResponse>(`${URL}/auth/user`, {
     headers: {
@@ -213,6 +227,7 @@ export const getUserApi = () =>
     } as HeadersInit
   });
 
+// обновление данных пользователя
 export const updateUserApi = (user: Partial<TRegisterData>) =>
   fetchWithRefresh<TUserResponse>(`${URL}/auth/user`, {
     method: 'PATCH',
@@ -223,6 +238,7 @@ export const updateUserApi = (user: Partial<TRegisterData>) =>
     body: JSON.stringify(user)
   });
 
+// выход из аккаунта
 export const logoutApi = () =>
   fetch(`${URL}/auth/logout`, {
     method: 'POST',
