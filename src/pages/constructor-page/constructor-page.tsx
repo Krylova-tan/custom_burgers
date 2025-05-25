@@ -25,7 +25,7 @@ export const ConstructorPage: FC = () => {
           </h1>
           <div className={`${styles.main} pl-5 pr-5`}>
             <BurgerIngredients />
-            <BurgerConstructor />
+            <BurgerConstructor data-cy='burger-constructor' />
           </div>
         </main>
       )}

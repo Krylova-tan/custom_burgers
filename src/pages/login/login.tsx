@@ -5,7 +5,7 @@ import { useDispatch } from '../../services/store';
 import { setCookie } from '../../utils/cookie';
 import {
   loginUser,
-  doLoginUserSuccess
+  makeLoginUserSuccess
 } from '../../slices/userSlices/userSlices';
 
 export const Login: FC = () => {
@@ -26,7 +26,7 @@ export const Login: FC = () => {
           return new Error('error');
         }
       })
-      .then(() => dispatch(doLoginUserSuccess(true)))
+      .then(() => dispatch(makeLoginUserSuccess(true)))
       .then(() => navigate('/'));
   };
 
