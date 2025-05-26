@@ -17,7 +17,6 @@ import {
 import { TOrder } from '@utils-types';
 import { RootState } from 'src/services/store';
 
-// начальное состояние хранилища
 export const initialState: Pick<TAuthResponse, 'user' | 'success'> & {
   orders: TOrder[];
   lastOrder: TOrder | null;
@@ -63,7 +62,7 @@ export const updateUserData = createAsyncThunk(
 
 export const getUserOrders = createAsyncThunk(
   'user/getUserOrders',
-  async () => await getOrdersApi()
+  getOrdersApi
 );
 
 export const newUserOrder = createAsyncThunk(
@@ -76,7 +75,7 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    doLoginUserSuccess: (state, action) => {
+    makeLoginUserSuccess: (state, action) => {
       state.success = action.payload;
     },
     setLastOrder: (state, action) => {
@@ -98,6 +97,7 @@ export const userSlice = createSlice({
         state.loading = false;
         state.success = false;
       })
+
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.success = false;
@@ -111,6 +111,7 @@ export const userSlice = createSlice({
         state.loading = false;
         state.success = false;
       })
+
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.success = false;
@@ -124,6 +125,7 @@ export const userSlice = createSlice({
         state.loading = false;
         state.success = false;
       })
+
       .addCase(updateUserData.pending, (state) => {
         state.loading = true;
         state.success = false;
@@ -137,6 +139,7 @@ export const userSlice = createSlice({
         state.loading = false;
         state.success = false;
       })
+
       .addCase(userLogout.pending, (state) => {
         state.loading = true;
         state.success = false;
@@ -150,16 +153,11 @@ export const userSlice = createSlice({
         state.loading = false;
         state.success = false;
       })
-      .addCase(getUserOrders.pending, (state) => {
-        state.loading = true;
-      })
+
       .addCase(getUserOrders.fulfilled, (state, action) => {
-        state.loading = false;
         state.orders = action.payload;
       })
-      .addCase(getUserOrders.rejected, (state, action) => {
-        state.loading = false;
-      })
+
       .addCase(newUserOrder.pending, (state) => {
         state.loading = true;
         state.orderRequestData = true;
@@ -179,7 +177,6 @@ export const userSlice = createSlice({
 
 const userSliceSelectors = (state: RootState) => state.user;
 
-// создание селекторов для извлечения данных
 export const getUser = createSelector(
   [userSliceSelectors],
   (state) => state.user
@@ -210,5 +207,5 @@ export const getOrderRequestStatus = createSelector(
   (state) => state.orderRequestData
 );
 
-export const { doLoginUserSuccess, setLastOrder } = userSlice.actions;
+export const { makeLoginUserSuccess, setLastOrder } = userSlice.actions;
 export const userSliceReducer = userSlice.reducer;
